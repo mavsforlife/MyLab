@@ -3,6 +3,7 @@
           package="com.mavsforlife.victor.mylab">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -31,6 +32,8 @@
         <activity android:name=".lab.LabActivity">
         </activity>
         <activity android:name=".main.FriendActivity">
+        </activity>
+        <activity android:name=".photoview.PhotoViewActivity">
         </activity>
     </application>
 
