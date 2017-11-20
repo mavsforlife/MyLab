@@ -1,6 +1,8 @@
 package com.mavsforlife.victor.mylab.widget.ninegridlayout;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,7 +15,9 @@ import com.bumptech.glide.request.transition.Transition;
 import com.mavsforlife.victor.mylab.R;
 import com.mavsforlife.victor.mylab.glide.GlideApp;
 import com.mavsforlife.victor.mylab.model.Image;
+import com.mavsforlife.victor.mylab.photoview.PhotoViewActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +26,6 @@ import java.util.List;
  */
 public class ImageNineGridView extends AbstractNineGridLayout<List<Image>> {
     private ImageView[] imageViews;
-    private View[] gifViews;
 
     public ImageNineGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,7 +35,6 @@ public class ImageNineGridView extends AbstractNineGridLayout<List<Image>> {
     protected void fill() {
         fill(R.layout.item_image_grid);
         imageViews = findInChildren(R.id.image, ImageView.class);
-        gifViews = findInChildren(R.id.gif, View.class);
     }
 
     @Override
@@ -51,22 +53,41 @@ public class ImageNineGridView extends AbstractNineGridLayout<List<Image>> {
                     }
                 });
         setDisplayCount(images.size());
-        for (int i = 0; i < images.size(); i++) {
-            String url = images.get(i).getUrl();
+        if (images.size() == 1) {
+            String url = images.get(0).getUrl();
+            ImageView imageView = imageViews[0];
             GlideApp.with(getContext())
                     .asBitmap()
                     .load(url)
+                    .fitCenter()
                     .error(R.color.gray)
-                    .into(imageViews[i]);
-            ImageView imageView = imageViews[i];
-            final int finalI = i;
+                    .into(imageView);
             imageView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getContext(), "点击了第" + (finalI + 1) + "张图片", Toast.LENGTH_SHORT).show();
+                    getContext().startActivity(PhotoViewActivity.createIntent(getContext(), (ArrayList<Image>) images, 0));
+                    ((Activity)getContext()).overridePendingTransition(0, 0);
                 }
             });
-            gifViews[i].setVisibility(url.endsWith(".gif") ? VISIBLE : INVISIBLE);
+        } else {
+            for (int i = 0; i < images.size(); i++) {
+                String url = images.get(i).getUrl();
+                GlideApp.with(getContext())
+                        .asBitmap()
+                        .load(url)
+                        .error(R.color.gray)
+                        .into(imageViews[i]);
+                ImageView imageView = imageViews[i];
+                final int finalI = i;
+                imageView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getContext().startActivity(PhotoViewActivity.createIntent(getContext(), (ArrayList<Image>) images, finalI));
+                        ((Activity)getContext()).overridePendingTransition(0, 0);
+                    }
+                });
+            }
         }
+
     }
 }
