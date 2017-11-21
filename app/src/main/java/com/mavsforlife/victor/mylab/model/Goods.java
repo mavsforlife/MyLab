@@ -15,6 +15,7 @@ public class Goods implements Parcelable {
 
     private String message;
     private List<Image> mImages;
+    private boolean isCollapsed = true;
 
     public String getMessage() {
         return message;
@@ -32,6 +33,14 @@ public class Goods implements Parcelable {
         mImages = images;
     }
 
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        isCollapsed = collapsed;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -40,7 +49,8 @@ public class Goods implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.message);
-        dest.writeList(this.mImages);
+        dest.writeTypedList(this.mImages);
+        dest.writeByte(this.isCollapsed ? (byte) 1 : (byte) 0);
     }
 
     public Goods() {
@@ -48,11 +58,11 @@ public class Goods implements Parcelable {
 
     protected Goods(Parcel in) {
         this.message = in.readString();
-        this.mImages = new ArrayList<Image>();
-        in.readList(this.mImages, Image.class.getClassLoader());
+        this.mImages = in.createTypedArrayList(Image.CREATOR);
+        this.isCollapsed = in.readByte() != 0;
     }
 
-    public static final Parcelable.Creator<Goods> CREATOR = new Parcelable.Creator<Goods>() {
+    public static final Creator<Goods> CREATOR = new Creator<Goods>() {
         @Override
         public Goods createFromParcel(Parcel source) {
             return new Goods(source);

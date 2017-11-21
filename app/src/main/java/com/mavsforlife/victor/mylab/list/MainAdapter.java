@@ -10,8 +10,10 @@ import android.widget.TextView;
 
 import com.mavsforlife.victor.mylab.R;
 import com.mavsforlife.victor.mylab.model.Goods;
+import com.mavsforlife.victor.mylab.widget.EllipsizingTextView;
 import com.mavsforlife.victor.mylab.widget.ninegridlayout.ImageNineGridView;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +48,15 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewHolder) {
-            Goods goods = mList.get(position);
+            final Goods goods = mList.get(position);
             ViewHolder h = (ViewHolder) holder;
-            h.mTvMsg.setText(goods.getMessage());
+            h.mTvMsg.setText(goods.getMessage(), goods.isCollapsed());
+            h.mTvMsg.setListener(new EllipsizingTextView.OnExpandStateChangeListener() {
+                @Override
+                public void onExpandStateChanged(boolean isExpanded) {
+                    goods.setCollapsed(isExpanded);
+                }
+            });
             h.mImageNineGridView.render(goods.getImages());
         }
     }
@@ -75,7 +83,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     
     static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView mTvTitle;
-        private TextView mTvMsg;
+        private EllipsizingTextView mTvMsg;
         private ImageView mIvAvatar;
         private ImageNineGridView mImageNineGridView;
 
