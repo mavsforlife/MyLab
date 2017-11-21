@@ -6,6 +6,7 @@
     <dimen name="sp_16">16sp</dimen>
     <dimen name="dp_10">10dp</dimen>
     <dimen name="dp_5">5dp</dimen>
+    <dimen name="dp_4">4dp</dimen>
     <dimen name="dp_0">0dp</dimen>
     <!--sp-->
     <dimen name="sp_18">18sp</dimen>

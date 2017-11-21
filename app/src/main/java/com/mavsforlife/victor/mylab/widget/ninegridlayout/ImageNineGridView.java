@@ -66,11 +66,13 @@ public class ImageNineGridView extends AbstractNineGridLayout<List<Image>> {
                 @Override
                 public void onClick(View v) {
                     getContext().startActivity(PhotoViewActivity.createIntent(getContext(), (ArrayList<Image>) images, 0));
-                    ((Activity)getContext()).overridePendingTransition(0, 0);
+                    ((Activity)getContext()).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
                 }
             });
         } else {
             for (int i = 0; i < images.size(); i++) {
+                if (i > 8) return;
                 String url = images.get(i).getUrl();
                 GlideApp.with(getContext())
                         .asBitmap()
@@ -83,7 +85,7 @@ public class ImageNineGridView extends AbstractNineGridLayout<List<Image>> {
                     @Override
                     public void onClick(View v) {
                         getContext().startActivity(PhotoViewActivity.createIntent(getContext(), (ArrayList<Image>) images, finalI));
-                        ((Activity)getContext()).overridePendingTransition(0, 0);
+                        ((Activity)getContext()).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     }
                 });
             }

@@ -2,6 +2,8 @@ package com.mavsforlife.victor.mylab.photoview;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +16,6 @@ import android.widget.ImageView;
 import com.mavsforlife.victor.mylab.R;
 import com.mavsforlife.victor.mylab.base.IntentFlag;
 import com.mavsforlife.victor.mylab.glide.GlideApp;
-import com.mavsforlife.victor.mylab.list.MainFragmentContract;
 import com.mavsforlife.victor.mylab.model.Image;
 import com.mavsforlife.victor.mylab.widget.ZoomImageView;
 
@@ -40,6 +41,9 @@ public class PhotoViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
+        }
         setContentView(R.layout.activity_photo_view);
 
         mList = getIntent().getParcelableArrayListExtra(IntentFlag.IMAGE_URL_LIST);
@@ -68,6 +72,12 @@ public class PhotoViewActivity extends AppCompatActivity {
             View v = LayoutInflater.from(PhotoViewActivity.this).inflate(R.layout.item_pager_image, null);
             ZoomImageView imageView = v.findViewById(R.id.iv_zoom);
 
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PhotoViewActivity.this.onBackPressed();
+                }
+            });
             GlideApp.with(PhotoViewActivity.this)
                     .asBitmap()
                     .load(imagePath)
@@ -97,6 +107,6 @@ public class PhotoViewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(0, 0);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }
