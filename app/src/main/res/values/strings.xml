@@ -11,4 +11,6 @@
     <string name="no_more">没有更多了...</string>
     <string name="friend_circle">朋友圈</string>
     <string name="test_source">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</string>
+    <string name="expand">展开</string>
+    <string name="shrink">收起</string>
 </resources>
