@@ -2,12 +2,13 @@ package com.mavsforlife.victor.mylab.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 /**
  * Created by victor on 2017/11/18.
  * Email: wwmdirk@gmail.com
  */
-
+@Keep
 public class Image implements Parcelable {
     private String url;
     private int width;

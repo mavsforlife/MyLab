@@ -1,6 +1,7 @@
 package com.mavsforlife.victor.mylab.util;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 import android.view.Window;
@@ -224,6 +225,26 @@ public class StatusbarColorUtils {
             if (flag) {
                 setStatusBarDarkIcon(activity.getWindow(), dark);
             }
+        }
+    }
+
+    /**
+     * android状态栏颜色修改
+     */
+    public static void setWindowStatusBarColor(Activity activity) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//5.0及以上
+                View decorView = activity.getWindow().getDecorView();
+                int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                decorView.setSystemUiVisibility(option);
+                activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//4.4到5.0
+                WindowManager.LayoutParams localLayoutParams = activity.getWindow().getAttributes();
+                localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

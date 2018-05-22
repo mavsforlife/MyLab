@@ -2,6 +2,7 @@ package com.mavsforlife.victor.mylab.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -9,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by victor on 2017/11/21.
  * Email: wwmdirk@gmail.com
  */
-
+@Keep
 public class Beauty implements Parcelable {
     /**
      * _id : 5a121895421aa90fe50c021e

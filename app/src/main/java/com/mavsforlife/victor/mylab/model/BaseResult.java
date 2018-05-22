@@ -1,10 +1,12 @@
 package com.mavsforlife.victor.mylab.model;
 
+import android.support.annotation.Keep;
+
 /**
  * Created by victor on 2017/11/20.
  * Email: wwmdirk@gmail.com
  */
-
+@Keep
 public class BaseResult<T> {
     private boolean error;
     private String msg;

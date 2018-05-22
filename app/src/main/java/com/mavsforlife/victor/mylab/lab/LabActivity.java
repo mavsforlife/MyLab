@@ -1,5 +1,6 @@
 package com.mavsforlife.victor.mylab.lab;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -16,15 +17,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mavsforlife.victor.mylab.BuildConfig;
 import com.mavsforlife.victor.mylab.R;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.PermissionNo;
+import com.yanzhenjie.permission.PermissionYes;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class LabActivity extends AppCompatActivity implements View.OnClickListener {
@@ -71,7 +79,9 @@ public class LabActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.tv_share) {
             intentToShare();
+//            getPermission();
         } else if (v.getId() == R.id.tv_share2) {
+//            getPermission();
             share();
         }
     }
@@ -80,19 +90,32 @@ public class LabActivity extends AppCompatActivity implements View.OnClickListen
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setType("image/*");
-//        shareIntent.setComponent(new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI"));//微信朋友圈
+        shareIntent.setComponent(new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI"));//微信朋友圈
 //        shareIntent.setComponent(new ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareImgUI"));//微信好友
-        shareIntent.setComponent(new ComponentName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.JumpActivity"));//qq
+//        shareIntent.setComponent(new ComponentName("com.tencent.mobileqq", "com.tencent.mobileqq.activity.JumpActivity"));//qq
 //        shareIntent.setComponent(new ComponentName("com.sina.weibo", "com.sina.weibo.EditActivity"));//微博
 //        shareIntent.setComponent(new ComponentName("com.qzone", "com.qzonex.module.operation.ui.QZonePublishMoodActivity"));//qq空间
         Uri uri;
         Uri uri2;
         File file = new File(getExternalCacheDir() + File.separator + "flower.jpg");
         File file2 = new File(getExternalCacheDir() + File.separator + "thunder.jpg");
+
+        shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-            shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
-            uri2 = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file2);
+            try {
+                uri =Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), "flower.jpg", null));
+                uri2 =Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), file2.getAbsolutePath(), "thunder.jpg", null));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                uri = null;
+                uri2 = null;
+            }
+
+
+//            shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
+//            uri2 = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file2);
         } else {
             uri = Uri.fromFile(file);
             uri2 = Uri.fromFile(file2);
@@ -100,8 +123,8 @@ public class LabActivity extends AppCompatActivity implements View.OnClickListen
         ArrayList<Uri> uris = new ArrayList<>();
         uris.add(uri);
         uris.add(uri2);
-//        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+//        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.putExtra("Kdescription", "测试一键分享图文到朋友圈");
         startActivity(shareIntent);
 
@@ -120,8 +143,14 @@ public class LabActivity extends AppCompatActivity implements View.OnClickListen
         File file2 = new File(getExternalCacheDir() + File.separator + "thunder.jpg");
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
-            uri2 = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file2);
+            try {
+                uri =Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), "1.jpg", null));
+                uri2 =Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), file2.getAbsolutePath(), "thunder.jpg", null));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                uri = null;
+                uri2 = null;
+            }
         } else {
             uri = Uri.fromFile(file);
             uri2 = Uri.fromFile(file2);
@@ -148,5 +177,23 @@ public class LabActivity extends AppCompatActivity implements View.OnClickListen
         } catch (IOException e) {
             Log.d("share", "saveFileFail");
         }
+    }
+
+    private void getPermission() {
+        AndPermission.with(this)
+                .requestCode(100)
+                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .callback(this)
+                .start();
+    }
+
+    @PermissionYes(100)
+    private void onPermissionYes() {
+        intentToShare();
+    }
+
+    @PermissionNo(100)
+    private void onPermissionNo() {
+        Toast.makeText(this, "没有权限", Toast.LENGTH_SHORT).show();
     }
 }

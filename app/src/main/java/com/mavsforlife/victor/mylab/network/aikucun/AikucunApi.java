@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
 /**
@@ -16,6 +17,6 @@ import retrofit2.http.QueryMap;
 
 public interface AikucunApi {
 
-    @GET("live.do?action={action}")
-    Observable<AikucuResult<DataBean>> getAction(@Path("action") String action, @QueryMap LinkedHashMap<String, String> map);
+    @GET("live.do?")
+    Observable<AikucuResult<DataBean>> getAction(@Query("action") String action, @QueryMap LinkedHashMap<String, String> map);
 }

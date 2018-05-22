@@ -9,8 +9,9 @@
     <string name="test_title">测试标题测试标题测试标题</string>
     <string name="test_content">测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容测试内容</string>
     <string name="no_more">没有更多了...</string>
-    <string name="friend_circle">朋友圈</string>
+    <string name="friend_circle">臻品购</string>
     <string name="test_source">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</string>
     <string name="expand">展开</string>
     <string name="shrink">收起</string>
+    <string name="prapare_pic">准备图片中</string>
 </resources>

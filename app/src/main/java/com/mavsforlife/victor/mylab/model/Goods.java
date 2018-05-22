@@ -2,6 +2,7 @@ package com.mavsforlife.victor.mylab.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  * Created by victor on 2017/11/14.
  * Email: wwmdirk@gmail.com
  */
-
+@Keep
 public class Goods implements Parcelable {
 
     private String message;

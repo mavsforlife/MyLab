@@ -4,6 +4,7 @@ package com.mavsforlife.victor.mylab.network;
 import com.mavsforlife.victor.mylab.network.gsonconverter.MyGsonConverterFactory;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
@@ -17,7 +18,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 public class NetWork {
 
     private static BaseApi sBaseApi;
-    private static OkHttpClient sOkHttpClient = new OkHttpClient();
+    private static OkHttpClient sOkHttpClient = new OkHttpClient().newBuilder()
+            .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build();
     private static Converter.Factory sConverterFactory = MyGsonConverterFactory.create();
     private static CallAdapter.Factory sCallAdapterFactory = RxJava2CallAdapterFactory.create();
 

@@ -2,8 +2,6 @@ package com.mavsforlife.victor.mylab.photoview;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +9,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.mavsforlife.victor.mylab.R;
 import com.mavsforlife.victor.mylab.base.IntentFlag;
@@ -22,14 +22,15 @@ import com.mavsforlife.victor.mylab.widget.ZoomImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoViewActivity extends AppCompatActivity {
+public class PhotoViewActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener{
 
     private ViewPager mViewPager;
-    private ImageView[] mDots;
-    private ImageView[] mPhotos;
+    private LinearLayout mDotLayout;
+    private List<ImageView> mDots;
 
     private List<Image> mList;
     private int mInitPos;
+    private int mLastPos;
 
     public static Intent createIntent(Context context, ArrayList<Image> list, int position) {
         Intent intent = new Intent(context, PhotoViewActivity.class);
@@ -41,27 +42,60 @@ public class PhotoViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.black));
-        }
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_photo_view);
 
         mList = getIntent().getParcelableArrayListExtra(IntentFlag.IMAGE_URL_LIST);
         mInitPos = getIntent().getIntExtra(IntentFlag.IMAGE_POSITION, IntentFlag.IMAGE_DEFAULT_POSITION);
         mViewPager = findViewById(R.id.view_pager);
+        mDotLayout = findViewById(R.id.dot);
         initPhoto();
     }
 
     private void initPhoto() {
+        mDots = new ArrayList<>();
         for (int i = 0; i < mList.size(); i++) {
             ZoomImageView imageView = new ZoomImageView(this);
             GlideApp.with(this)
                     .asBitmap()
                     .load(mList.get(i).getUrl())
                     .into(imageView);
+
+            if (mList.size() > 1) {
+                ImageView dot = new ImageView(this);
+                dot.setPadding(10, 10, 10, 10);
+                if (i == mInitPos) {
+                    dot.setImageResource(R.drawable.dot_now);
+                } else {
+                    dot.setImageResource(R.drawable.dot_page);
+                }
+                mDots.add(dot);
+                mDotLayout.addView(dot);
+            }
         }
+        mLastPos = mInitPos;
         mViewPager.setAdapter(new Adapter());
+        mViewPager.addOnPageChangeListener(this);
         mViewPager.setCurrentItem(mInitPos);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (position == mLastPos || mList.size() <= 1) return;
+        mDots.get(mLastPos).setImageResource(R.drawable.dot_page);
+        mDots.get(position).setImageResource(R.drawable.dot_now);
+        mLastPos = position;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 
     class Adapter extends PagerAdapter {
@@ -69,7 +103,7 @@ public class PhotoViewActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             String imagePath = mList.get(position).getUrl();
-            View v = LayoutInflater.from(PhotoViewActivity.this).inflate(R.layout.item_pager_image, null);
+            View v = LayoutInflater.from(PhotoViewActivity.this).inflate(R.layout.item_pager_image, container, false);
             ZoomImageView imageView = v.findViewById(R.id.iv_zoom);
 
             imageView.setOnClickListener(new View.OnClickListener() {

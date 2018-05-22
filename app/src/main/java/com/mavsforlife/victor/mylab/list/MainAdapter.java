@@ -27,13 +27,16 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_FOOTER = 1;
     private Context mContext;
+    private ShareListener mListener;
     private List<Goods> mList;
     private LayoutInflater mLayoutInflater;
+    private FooterHolder mFooterHolder;
 
-    public MainAdapter(Context context) {
+    public MainAdapter(Context context, ShareListener listener) {
         mContext = context;
         mLayoutInflater = LayoutInflater.from(mContext);
         mList = new ArrayList<>();
+        mListener = listener;
     }
 
     @Override
@@ -41,12 +44,13 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (viewType == TYPE_ITEM) {
             return new ViewHolder(mLayoutInflater.inflate(R.layout.item_good, parent, false));
         } else {
-            return new FooterHolder(mLayoutInflater.inflate(R.layout.item_image_grid_footer, parent, false));
+            mFooterHolder = new FooterHolder(mLayoutInflater.inflate(R.layout.item_image_grid_footer, parent, false));
+            return mFooterHolder;
         }
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ViewHolder) {
             final Goods goods = mList.get(position);
             ViewHolder h = (ViewHolder) holder;
@@ -58,6 +62,12 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             });
             h.mImageNineGridView.render(goods.getImages());
+            h.mTvShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onShare(position);
+                }
+            });
         }
     }
 
@@ -80,9 +90,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mList = list;
         notifyDataSetChanged();
     }
-    
+
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView mTvTitle;
+        private TextView mTvTitle, mTvDown, mTvShare;
         private EllipsizingTextView mTvMsg;
         private ImageView mIvAvatar;
         private ImageNineGridView mImageNineGridView;
@@ -93,6 +103,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             mTvMsg = itemView.findViewById(R.id.tv_content);
             mIvAvatar = itemView.findViewById(R.id.iv_avatar);
             mImageNineGridView = itemView.findViewById(R.id.img_view);
+            mTvShare = itemView.findViewById(R.id.share);
+            mTvDown = itemView.findViewById(R.id.down);
         }
     }
 
@@ -104,5 +116,10 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             mTvNoMore = itemView.findViewById(R.id.tv_no_more);
         }
+    }
+
+    interface ShareListener {
+
+        void onShare(int position);
     }
 }

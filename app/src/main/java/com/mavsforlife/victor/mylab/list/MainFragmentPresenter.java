@@ -1,8 +1,16 @@
 package com.mavsforlife.victor.mylab.list;
 
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.MonthDisplayHelper;
+import android.widget.Toast;
 
 import com.mavsforlife.victor.mylab.model.BaseResult;
 import com.mavsforlife.victor.mylab.model.Beauty;
@@ -14,16 +22,33 @@ import com.mavsforlife.victor.mylab.network.NetWork;
 import com.mavsforlife.victor.mylab.network.aikucun.AikucuResult;
 import com.mavsforlife.victor.mylab.network.aikucun.AikucunNetWork;
 import com.mavsforlife.victor.mylab.network.aikucun.model.DataBean;
+import com.mavsforlife.victor.mylab.util.DialogUtil;
+import com.mavsforlife.victor.mylab.util.DownLoadImageUtil;
+import com.mavsforlife.victor.mylab.util.StringUtil;
 
+import org.reactivestreams.Publisher;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.channels.NetworkChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * Created by victor on 2017/11/13.
@@ -34,7 +59,7 @@ public class MainFragmentPresenter implements MainFragmentContract.Presenter {
 
     private Context mContext;
     private MainFragmentContract.View mView;
-
+    private List<Goods> mList;
     public MainFragmentPresenter(Context context, MainFragmentContract.View view) {
         mContext = context;
         mView = view;
@@ -73,6 +98,7 @@ public class MainFragmentPresenter implements MainFragmentContract.Presenter {
                             image.setUrl(list1.get(i).getUrl());
                             list.get(i).getImages().add(image);
                         }
+                        mList = list;
                         mView.loadGoods(list);
                     }
 
@@ -87,64 +113,48 @@ public class MainFragmentPresenter implements MainFragmentContract.Presenter {
                     }
                 });
 
-//        AikucunNetWork.getAikucunApi()
-//                .getAction("getState2", getQueryMap())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new BaseObserver<AikucuResult<DataBean>>() {
-//
-//                    @Override
-//                    public void onNext(AikucuResult<DataBean> dataBeanAikucuResult) {
-//                        super.onNext(dataBeanAikucuResult);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        super.onError(e);
-//                    }
-//                });
-
-        String str = md5("action=getState2&appid=28769828&did=962f246b7d1115e7647ce90f3ce94579&noncestr=123456&sync=0&timestamp=1511329875&token=8a9b048d5fdf5b2f015fe1abcfb62ec0&userid=8a9b048d5fd72a9b015fd735abc507bb");
-        Log.d("md5", str);
-        String str2 = md5("appid=28769828&did=962f246b7d1115e7647ce90f3ce94579&noncestr=123456&sync=0&timestamp=1511329875&token=8a9b048d5fdf5b2f015fe1abcfb62ec0&userid=8a9b048d5fd72a9b015fd735abc507bb");
-        Log.d("md5", str2);
-
-    }
-    //http://app.akucun.com/api/v1.0/live.do?action=getState2&appid=28769828&did=962f246b7d1115e7647ce90f3ce94579
-    // &noncestr=123456&sync=0&timestamp=1511329875&token=8a9b048d5fdf5b2f015fe1abcfb62ec0&userid=8a9b048d5fd72a9b015fd735abc507bb&sig=2ae214ff9eba21302e81b61665cbbba84c51575b
-    private LinkedHashMap<String, String> getQueryMap() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put("appid", "28769828");
-        map.put("did", "962f246b7d1115e7647ce90f3ce94579");
-        map.put("noncestr", "123456");
-        map.put("sync", "0");
-        map.put("timestamp", "1511329875");
-        map.put("token", "8a9b048d5fdf5b2f015fe1abcfb62ec0");
-        map.put("userid", "8a9b048d5fd72a9b015fd735abc507bb");
-        map.put("sig", "2ae214ff9eba21302e81b61665cbbba84c51575b");
-        return map;
     }
 
-    public static String md5(String string) {
-        if (TextUtils.isEmpty(string)) {
-            return "";
-        }
-        MessageDigest md5 = null;
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-            byte[] bytes = md5.digest(string.getBytes());
-            String result = "";
-            for (byte b : bytes) {
-                String temp = Integer.toHexString(b & 0xff);
-                if (temp.length() == 1) {
-                    temp = "0" + temp;
-                }
-                result += temp;
-            }
-            return result;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return "";
+    @Override
+    public void onShare(final int position) {
+        final Goods goods = mList.get(position);
+        final List<File> files = new ArrayList<>();
+        Observable.fromIterable(goods.getImages())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .map(new Function<Image, File>() {
+                    @Override
+                    public File apply(Image image) throws Exception {
+                        String fileName = position+ "_" + StringUtil.getImgName(image.getUrl());
+                        return DownLoadImageUtil.savePicture(mContext, fileName, image.getUrl());
+                    }
+                })
+                .subscribe(new Observer<File>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        DialogUtil.showProgressDialog(mContext);
+                    }
+
+                    @Override
+                    public void onNext(File file) {
+                        files.add(file);
+                        Log.d("save", "图片已成功保存到" + file.getName());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        DialogUtil.hideProgressDialog();
+                        e.printStackTrace();
+                        Log.d("save", e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        DialogUtil.hideProgressDialog();
+                        mView.shareTo(files);
+                    }
+                });
+
+
     }
 }

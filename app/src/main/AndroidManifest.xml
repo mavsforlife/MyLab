@@ -3,6 +3,8 @@
           package="com.mavsforlife.victor.mylab">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -11,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.MainActivity">
+        <activity android:name=".main.MainActivity"
+            android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -29,11 +32,14 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <activity android:name=".lab.LabActivity">
+        <activity android:name=".lab.LabActivity"
+            android:configChanges="orientation|keyboardHidden">
         </activity>
-        <activity android:name=".main.FriendActivity">
+        <activity android:name=".main.FriendActivity"
+            android:configChanges="orientation|keyboardHidden">
         </activity>
-        <activity android:name=".photoview.PhotoViewActivity">
+        <activity android:name=".photoview.PhotoViewActivity"
+            android:configChanges="orientation|keyboardHidden">
         </activity>
     </application>
 

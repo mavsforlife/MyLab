@@ -1,11 +1,14 @@
 package com.mavsforlife.victor.mylab.model;
 
+import android.support.annotation.Keep;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by CaoDongping on 5/12/16.
  */
+@Keep
 public class PostFactory {
     private static final String CONTENT = "在孩子的世界里，风是可以画出来的...很多现代绘画大师最终的梦想就是成为一个孩子，画儿童画——因为儿童会用最童真的视角来描绘自己的世界，即使不“像”，但是很准确。六一即将来临，张小江有奖征集儿童画，赶紧给你家宝宝投稿吧！\n" +
             "http://ww3.sinaimg.cn/orj480/aa1d0c12gw1f3sco5s6dbj21kw24nkdd.jpg|249|335\n" +

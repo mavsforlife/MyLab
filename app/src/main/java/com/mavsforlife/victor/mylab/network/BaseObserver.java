@@ -18,16 +18,20 @@ public class BaseObserver<T> implements Observer<T> {
 
     @Override
     public void onNext(T t) {
-
+        if (isCancel()) return;
     }
 
     @Override
     public void onError(Throwable e) {
-
+        if (isCancel()) return;
     }
 
     @Override
     public void onComplete() {
 
+    }
+
+    protected boolean isCancel() {
+        return false;
     }
 }
