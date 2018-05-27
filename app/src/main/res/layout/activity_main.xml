@@ -23,4 +23,30 @@
         android:text="@string/share_to_friend_circle"
         android:gravity="center"
         android:padding="@dimen/dp_10"/>
+
+    <TextView
+        android:id="@+id/tv_translate_in"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="测试飞入"
+        android:padding="@dimen/dp_10"/>
+
+    <TextView
+        android:id="@+id/tv_translate_out"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="测试飞出"
+        android:padding="@dimen/dp_10"/>
+
+    <LinearLayout
+        android:id="@+id/ll_target"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        android:background="@color/colorAccent"
+        android:visibility="gone">
+
+    </LinearLayout>
 </LinearLayout>
